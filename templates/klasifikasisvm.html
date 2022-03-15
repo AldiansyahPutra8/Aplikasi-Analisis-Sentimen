@@ -1,0 +1,268 @@
+{% include 'header.html' %}
+<!-- Begin Page Content -->
+  <div class="container-fluid">
+
+    <!-- Content Row -->
+    <!-- Approach -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Klasifikasi SVM</h6>
+      </div>
+
+      <div class="card-body">
+        <h2>Proses Klasifikasi SVM</h2>
+        <p>Silahkan klik tombol di bawah ini untuk melakukan proses Klasifikasi SVM
+          dengan menggunakan hasil dari proses pembobotan TF-IDF sebelumnya.</p>
+
+        <form enctype="multipart/form-data" action="/grafik-data/result" method="POST">
+          <div class="mt-3">
+            <button type="submit" name="" value="klasifikasisvm" class="btn btn-primary">Klasifikasi SVM</button>
+          </div>
+          <br>
+        </form>
+      </div>
+    </div>
+    <!-- Approach -->
+    {% if values %}
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Nilai Hasil Klasifikasi SVM Kernel RBF</h1>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Tweet Positif</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{tweet_positive}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings (Monthly) Card Example -->
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Tweet Negatif</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{tweet_negative}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings (Monthly) Card Example -->
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                  Tweet Netral</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{tweet_netral}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Requests Card Example -->
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Tweet</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{total_tweet}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>        
+    </div>
+
+    <div class="row">
+      <!-- Earnings (Monthly) Card Example -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                  Akurasi Model RBF</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{accuracy_rbf}} %</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /Content Row -->
+    </div>
+
+    <div class="row">
+      <!-- Donut Chart -->
+      <div class="col-xl-6">
+        <div class="card shadow mb-4">
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="chart-pie pt-4">
+              <canvas id="myPieChart"></canvas>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="col-xl-6">
+        <div class="card shadow mb-4">
+          <div class="card-body">
+            <div class="chart-bar">
+              <canvas id="myBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Content Row -->
+    {% endif %}
+  </div>
+<!-- /.container-fluid -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Chart Pie script -->
+<script>
+  // Set new default font family and font color to mimic Bootstrap's default styling
+  Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+  Chart.defaults.global.defaultFontColor = '#858796';
+
+  // Pie Chart Example
+  var ctx = document.getElementById("myPieChart");
+  var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: [
+        {% for item in labels %}
+          "{{ item }}", 
+        {% endfor %}
+      ],
+      datasets: [{
+        data: [
+          {% for item in values %}
+            {{ item }}, 
+          {% endfor %}
+        ],
+        backgroundColor: [
+          {% for item in colors %}
+            "{{ item }}", 
+          {% endfor %}
+        ],
+        hoverBorderColor: "rgba(234, 236, 244, 1)",
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      tooltips: {
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        caretPadding: 10,
+      },
+      legend: {
+        display: true
+      },
+    },
+  });
+</script>
+
+<!-- Chart Bar script -->
+<script>
+  // Set new default font family and font color to mimic Bootstrap's default styling
+  Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+  Chart.defaults.global.defaultFontColor = '#858796';
+
+  // Bar Chart Example
+  var ctx = document.getElementById("myBarChart");
+  var myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [
+        {% for item in bar_labels %}
+          "{{ item }}", 
+        {% endfor %}
+      ],
+      datasets: [{
+        backgroundColor: "#4e73df",
+        hoverBackgroundColor: "#2e59d9",
+        borderColor: "#4e73df",
+        data: [
+          {% for item in bar_values %}
+            "{{ item }}", 
+          {% endfor %}
+        ],
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      legend: {
+        display: false
+      },
+      tooltips: {
+        titleMarginBottom: 10,
+        titleFontColor: '#6e707e',
+        titleFontSize: 14,
+        backgroundColor: "rgb(255,255,255)",
+        bodyFontColor: "#858796",
+        borderColor: '#dddfeb',
+        borderWidth: 1,
+        xPadding: 15,
+        yPadding: 15,
+        displayColors: false,
+        caretPadding: 10,
+      },
+    }
+  });
+</script>
+
+
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script
+  src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Core plugin JavaScript-->
+<script
+  src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+
+<!-- Page level plugins -->
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+
+<!-- Page level custom scripts -->
+<!-- <script src="{{ url_for('static', filename='js/demo/chart-bar-demo.js') }}"></script> -->
+<!-- <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script> -->
+</body>
+
+</html>
